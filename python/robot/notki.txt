@@ -1,0 +1,11 @@
+nao wifi: 10.20.104.69
+nao local http://169.254.113.113/
+nao
+naomakota321
+
+
+>>> cv2.namedWindow('aa')
+OpenCV Error: Unspecified error (The function is not implemented. Rebuild the library with Windows, GTK+ 2.x or Carbon support. If you are on Ubuntu or Debian, install libgtk2.0-dev and pkg-config, then re-run cmake or configure script) in cvNamedWindow, file /opennao-atom/tmp/portage/media-libs/opencv-2.3.1a-r5/work/OpenCV-2.3.1/modules/highgui/src/window.cpp, line 275
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+cv2.error: /opennao-atom/tmp/portage/media-libs/opencv-2.3.1a-r5/work/OpenCV-2.3.1/modules/highgui/src/window.cpp:275: error: (-2) The function is not implemented. Rebuild the library with Windows, GTK+ 2.x or Carbon support. If you are on Ubuntu or Debian, install libgtk2.0-dev and pkg-config, then re-run cmake or configure script in function cvNamedWindow

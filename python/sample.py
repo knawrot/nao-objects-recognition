@@ -1,0 +1,4 @@
+
+def sample():
+	print 'sample'
+	

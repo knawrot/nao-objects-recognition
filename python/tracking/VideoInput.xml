@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ModulePreference name="aldebaran-robotics.com@VideoInput" xmlns="http://www.aldebaran-robotics.com/ns/ALPreference" schemaLocation="ModulePreference.xsd">
+
+    <!-- uncomment the wanted Module -->
+    <Preference name="videoModule" description="Name of the videoInput module to be loaded" type="string" value="SimulatorCam"/>
+    <!--Preference name="videoModule" description="Name of the videoInput module to be loaded" type="string" value="FileCam"/-->
+
+</ModulePreference>

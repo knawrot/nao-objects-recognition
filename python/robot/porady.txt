@@ -1,0 +1,14 @@
+1. U¿ywanie logview albo start naoqi albo Choreographe http://doc.aldebaran.com/2-1/dev/tools/naoqi.html
+2. emerge -s *nazwa-pakietu* - wyszukuje na repo takiego pakietu
+3. emrge *nazwa-pakietu* - zaci¹ga
+4. Update dependcji:
+# Deep: view update then do it update
+root@myhost # emerge -puvD world
+root@myhost # emerge -uvD world
+5. equery - przydatne do wyswietlania zaleznosci
+6. packge do sciagniecia - gtk+ i 
+
+Przydatne do instalacji OpenCV:
+http://www.pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/
+na yt https://www.youtube.com/watch?v=MqQB5KKJCh0 uzyli BUILD_NEW_PYTHON_SUPPORT=ON i CMAKE_INSTALL_PREFIX=/usr/local
+http://doc.aldebaran.com/2-1/dev/cpp/examples/vision/opencv.html?highlight=opencv
