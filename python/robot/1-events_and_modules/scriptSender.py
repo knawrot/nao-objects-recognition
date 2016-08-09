@@ -1,6 +1,6 @@
 from naoqi import ALProxy
 
-host = "127.0.0.1"
+host = "169.254.113.113"
 port = 9559
 		
 memory = ALProxy("ALMemory", host, port)

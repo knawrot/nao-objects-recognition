@@ -49,6 +49,7 @@ def printRange(event,x,y,flags,param):
 		print '(%s,%s,%s), (%s,%s,%s)' % (h_min,s_min,v_min,h_max,s_max,v_max)
 		
 def main():  
+	global h_min, s_min, v_min, h_max, s_max, v_max
 	basicVideoProcessing = BasicVideoProcessing()
 	basicVideoProcessing.connectToCamera()
 	

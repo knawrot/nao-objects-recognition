@@ -1,11 +1,11 @@
-from naoqi import ALProxy, ALModule, ALBroker
 import sys
-import cv2
+from time import sleep
+from importlib import import_module
 import numpy as np
-import sample
+from naoqi import ALProxy, ALModule, ALBroker
 
 # constants
-NAO_IP = "169.254.76.7"
+NAO_IP = "127.0.0.1"
 NAO_PORT = 9559
 # global
 NaoWorkingMode = None
@@ -15,11 +15,11 @@ class BasicVideoProcessing(object):
 	""" A class that handles some basic operations with NAO's camera. """
 	
 	def __init__(self):
-		self.camProxy = ALProxy("ALVideoDevice", NAO_IP, NAO_PORT)		
+		self.camProxy = ALProxy("ALVideoDevice")		
         
 	def connectToCamera(self):
 		try:
-			clientName = "red-ball-client"
+			clientName = "nao-app-client"
 			cameraNum = 0
 			resolutionOptNum = 1
 			colorspaceOptNum = 13
@@ -54,12 +54,12 @@ class SpeechDetectionModule(ALModule):
 		self.memory = ALProxy("ALMemory")
 		self.asr = ALProxy("ALSpeechRecognition")
 		self.asr.setLanguage("English")
-		vocabulary = ["color", "text", "hand", "phone"]
+		vocabulary = ["color", "text", "gesture", "phone"]
 		self.asr.setVocabulary(vocabulary, False)
 		self.asr.subscribe(self.getName())
-		self.memory.subscribeToEvent("WordRecognized", self.getName(), "onWordRecognized")
+		self.memory.subscribeToEvent("WordRecognized", self.getName(), "onMyWordRecognized")
 	
-	def onWordRecognized(self, key, value, message):	
+	def onMyWordRecognized(self, key, value, message):	
 		""" A method that handles command recognition. """
 		global NaoWorkingMode
 		if(len(value) > 1 and value[1] >= 0.5):
@@ -68,6 +68,13 @@ class SpeechDetectionModule(ALModule):
 		else:
 			print 'unsifficient threshold'
 			NaoWorkingMode = None
+			
+	def disconnect(self):
+		try:
+			self.memory.unsubscribeToEvent("WordRecognized", self.getName())
+			self.asr.unsubscribe(self.getName())
+		except BaseException, err:
+			print "Error while disconnecting from speech module: " + str(err)
 
 			
 		
@@ -81,33 +88,43 @@ def main():
 		
 	global SpeechDetection, NaoWorkingMode
 	SpeechDetection = SpeechDetectionModule("SpeechDetection")
-	basicVideoProcessing = BasicVideoProcessing()
-	basicVideoProcessing.connectToCamera()
-	
+	NaoWorkingMode = None
+		
 	try:
+		while NaoWorkingMode not in ["color", "text", "gesture", "phone"]:
+			pass
+		
+		SpeechDetection.disconnect()
+		
+		print 'Working in ' + NaoWorkingMode + ' detection mode...'
+		proxyDetection = import_module('recognition.' + NaoWorkingMode + '.detection')
+		proxyReaction = import_module('recognition.' + NaoWorkingMode + '.reaction')	
+		global ReactionUnit
+		ReactionUnit = proxyReaction.ReactionModule("ReactionUnit")			
+			
+		proxyDetection.setup()
+		proxyReaction.setup()
+		basicVideoProcessing = BasicVideoProcessing()
+		basicVideoProcessing.connectToCamera()
+	    
+		sleep(1) # wait a second for the camera to get proper amount of lightning (not overflooded by light on startup)
+		
 		while True:
 			img = basicVideoProcessing.getImageFromCamera()
 			if (img == None):
 				print "Image from camera is empty!"
 				break
 			else:
-				if NaoWorkingMode == None:
-					sample.sample()
-				elif NaoWorkingMode == "color":
-					print 'Working in color detection mode...'
-					#cv2.imshow('Color', img) - cos nie dziala, pewnie kwestia tego, ze to kod ladowany jako modul
-				elif NaoWorkingMode == "text":
-					print 'Working in text detection mode...'
-				elif NaoWorkingMode == "hand":
-					print 'Working in hand gesture detection mode...'
-				elif NaoWorkingMode == "phone":
-					print 'Working in mobile phone detection mode...'
+				if not proxyDetection.detect(img):
+					break
+			
 	except KeyboardInterrupt:
-		print "Interrupted by user, shutting down"
+		print "Interrupted by user, shutting down..."
 	except RuntimeError, err:
 		print "An error occured: " + str(err)
-		
-	cv2.destroyAllWindows()
+	
+	proxyReaction.shutdownThread = True
+	ReactionUnit.disconnect()
 	basicVideoProcessing.disconnectFromCamera()
 	myBroker.shutdown()
 	sys.exit(0)

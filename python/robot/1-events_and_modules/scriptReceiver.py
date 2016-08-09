@@ -1,6 +1,6 @@
 from naoqi import ALModule, ALProxy
 
-NAO_IP = "127.0.0.1"
+NAO_IP = "169.254.113.113"
 NAO_PORT = 9559
 
 class BasicEventHandlingModule(ALModule):
